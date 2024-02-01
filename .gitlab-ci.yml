@@ -7,7 +7,7 @@ workflow:
 stages:
   - deploy
 
-deploy:
+pages:
   stage: deploy
   before_script:
     - cd counterexample
