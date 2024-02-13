@@ -160,6 +160,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
             ),
+            ElevatedButton(
+              onPressed: _incrementCounter,
+              child: const Text('Increment'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                widget.storage.writeCounter(0);
+                setState(() {
+                  _counterFuture = Future.value(0);
+                });
+              },
+              child: const Text('Reset'),
+            ),
             // _counter == null
             //     ? const CircularProgressIndicator()
             //     : Text(
