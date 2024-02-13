@@ -1,7 +1,7 @@
 import 'package:counterexample/storage.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 

@@ -29,9 +29,15 @@ class CountObject {
 }
 
 class CounterStorage {
-  late Database _db;
+  Database? _db;
 
-  CounterStorage();
+  void initDB() async {
+    _db = await open('counter.db');
+  }
+
+  CounterStorage() {
+    initDB();
+  }
 
   Future open(String path) async {
     _db = await openDatabase(path, version: 1,
@@ -45,12 +51,12 @@ create table $tableCount (
   }
 
   Future<CountObject> insert(CountObject co) async {
-    co.id = await _db.insert(tableCount, co.toMap());
+    co.id = await _db!.insert(tableCount, co.toMap());
     return co;
   }
 
   Future<CountObject> getCount(int id) async {
-    List<Map> maps = await _db.query(tableCount,
+    List<Map> maps = await _db!.query(tableCount,
         columns: [columnId, columnCount],
         where: '$columnId = ?',
         whereArgs: [id]);
@@ -65,17 +71,19 @@ create table $tableCount (
   }
 
   Future<int> update(CountObject co) async {
-    return await _db.update(tableCount, co.toMap(),
+    return await _db!.update(tableCount, co.toMap(),
         where: '$columnId = ?', whereArgs: [co.id]);
   }
 
-  Future close() async => _db.close();
+  Future close() async => _db!.close();
 
   Future<int> readCounter() async {
     try {
-      await open('counter.db');
+      if (_db == null) {
+        await open('counter.db');
+      }
       CountObject co = await getCount(1);
-      await close();
+      // await close();
       return co.count;
     } catch (e) {
       if (kDebugMode) {
@@ -87,18 +95,20 @@ create table $tableCount (
 
   Future<void> writeCounter(int counter) async {
     try {
-      await open('counter.db');
+      // await open('counter.db');
       // Copilot Code
       // CountObject co = await getCount(1);
       // co.count = counter;
       // await update(co);
-
+      if (_db == null) {
+        await open('counter.db');
+      }
       // Original Code
       CountObject co = CountObject();
       co.count = counter;
       co.id = 1;
       await update(co);
-      await close();
+      // await close();
     } catch (e) {
       if (kDebugMode) {
         print(e);
