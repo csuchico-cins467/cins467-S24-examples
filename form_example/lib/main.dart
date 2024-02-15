@@ -55,12 +55,44 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController _myController = TextEditingController();
+  late TextEditingController _myController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String displayText = '';
-  void _update() {
-    setState(() {
-      displayText = _myController.text;
-    });
+
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Processing Data')),
+      );
+      setState(() {
+        displayText = _myController.text;
+      });
+    }
+  }
+
+  @override
+  dispose() {
+    _myController.dispose();
+    super.dispose();
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _myController = TextEditingController();
+  }
+
+  String? _validateInput(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter some text';
+    }
+    if (value.contains("@")) {
+      return "Don't use @ symbol";
+    }
+    if (value.contains(" ")) {
+      return "No spaces allowed";
+    }
+    return null;
   }
 
   @override
@@ -100,24 +132,23 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            TextField(
-                controller: _myController,
-                decoration: InputDecoration(
-                  // suffixIcon: Icon(Icons.clear),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _myController.clear();
-                    },
+            Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  TextFormField(
+                    controller: _myController,
+                    validator: _validateInput,
+                    decoration: const InputDecoration(
+                      labelText: 'Enter some text',
+                    ),
                   ),
-                  border: OutlineInputBorder(),
-                  labelText: 'Enter some text',
-                  hintText: 'hint text',
-                  filled: true,
-                )),
-            ElevatedButton(
-              onPressed: _update,
-              child: const Text('Update'),
+                  ElevatedButton(
+                    onPressed: _submit,
+                    child: const Text('Update'),
+                  ),
+                ],
+              ),
             ),
             Text(
               displayText,
