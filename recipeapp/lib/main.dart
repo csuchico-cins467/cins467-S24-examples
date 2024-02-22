@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const MyApp());
@@ -75,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (kDebugMode) {
         print(data['recipes'][0]);
       }
-      return List.empty();
+      return data['recipes'];
     } else {
       if (kDebugMode) {
         // If the server did not return a 200 OK response,
@@ -85,8 +86,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       return List.empty();
     }
-
-    return List.empty();
   }
 
   @override
@@ -113,19 +112,39 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: const Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-          ],
-        ),
+      body: FutureBuilder<List<dynamic>>(
+        future: _futureRecipes,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                      onTap: () {
+                        _launchUrl(Uri.parse(snapshot.data![index]['url']));
+                      },
+                      child: Card(
+                        child: Column(children: [
+                          ListTile(title: Text(snapshot.data![index]['title'])),
+                          Image.network(snapshot.data![index]['photo_url'],
+                              height: 400),
+                        ]),
+                      ));
+                });
+          }
+        },
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<void> _launchUrl(Uri _url) async {
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+    }
   }
 }
