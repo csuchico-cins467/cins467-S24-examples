@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:counterexample/firebase_options.dart';
 import 'package:counterexample/storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:geolocator/geolocator.dart';
@@ -69,6 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // int? _counter;
   late Future<int> _counterFuture;
   late Future<Position> _currentPosition;
+  Position? _position;
+  late Stream<Position> _positionStream;
 
   // Determine the current position of the device.
   ///
@@ -151,6 +156,23 @@ class _MyHomePageState extends State<MyHomePage> {
     //   });
     // });
     _currentPosition = _determinePosition();
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100,
+    );
+    _positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings);
+    Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position? position) {
+      if (kDebugMode) {
+        print(position == null
+            ? 'Unknown'
+            : '${position.latitude!.toString()}, ${position.longitude!.toString()}');
+      }
+      setState(() {
+        _position = position;
+      });
+    });
   }
 
   @override
@@ -237,7 +259,29 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
                 return Text(
                   'Location: ${snapshot.data!.latitude}, ${snapshot.data!.longitude}, ${snapshot.data!.accuracy}',
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                );
+              },
+            ),
+            _position == null
+                ? const CircularProgressIndicator()
+                : Text(
+                    'Location: ${_position!.latitude}, ${_position!.longitude}, ${_position!.accuracy}',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+            StreamBuilder<Position>(
+              stream: _positionStream,
+              builder:
+                  (BuildContext context, AsyncSnapshot<Position> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                return Text(
+                  'Location: ${snapshot.data!.latitude}, ${snapshot.data!.longitude}, ${snapshot.data!.accuracy}',
+                  style: Theme.of(context).textTheme.headlineSmall,
                 );
               },
             ),
