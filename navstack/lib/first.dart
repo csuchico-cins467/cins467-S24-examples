@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:navstack/components/drawer.dart';
 import 'package:navstack/second.dart';
 
 class FirstRoute extends StatelessWidget {
@@ -10,6 +11,7 @@ class FirstRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text('First Route'),
       ),
+      drawer: getDrawer(context),
       body: Center(
         child: ElevatedButton(
           child: const Text('Open route'),
