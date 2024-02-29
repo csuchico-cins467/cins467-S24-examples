@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:counterexample/firebase_options.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,6 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
   late Future<Position> _currentPosition;
   Position? _position;
   late Stream<Position> _positionStream;
+  final ImagePicker picker = ImagePicker();
+  late Future<File> _imageFile;
 
   // Determine the current position of the device.
   ///
@@ -144,8 +148,18 @@ class _MyHomePageState extends State<MyHomePage> {
   //   });
   // }
 
+  Future<File> _getImage() async {
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      return File(pickedFile.path);
+    }
+    return Future.error('No image selected');
+  }
+
   void initState() {
     super.initState();
+    _imageFile = Future.value(File(''));
     // TRY THIS: Uncomment the following line to see the counter persist across
     // hot reloads and restarts.
     _counterFuture = widget.storage.readCounter();
@@ -212,6 +226,33 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            FutureBuilder<File>(
+              future: _imageFile,
+              builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                try {
+                  if (snapshot.data != null && snapshot.data!.path.isNotEmpty) {
+                    return Image.file(
+                      snapshot.data!,
+                      width: 100,
+                      height: 100,
+                    );
+                  }
+                } catch (e) {
+                  if (kDebugMode) {
+                    print(e);
+                  }
+                }
+
+                return const Placeholder(
+                  fallbackHeight: 200,
+                  fallbackWidth: 200,
+                  child: SizedBox.shrink(),
+                );
+              },
+            ),
             const Text(
               'Bob\'s Counter Example',
             ),
@@ -289,9 +330,13 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        onPressed: () {
+          setState(() {
+            _imageFile = _getImage();
+          });
+        },
+        tooltip: 'Add a photo',
+        child: const Icon(Icons.add_a_photo),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
