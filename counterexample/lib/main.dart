@@ -222,9 +222,13 @@ class _MyHomePageState extends State<MyHomePage> {
         'You have pushed the button this many times:',
       ),
       //copilot generated code
-      StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('example').snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('example')
+            .doc('counter')
+            .snapshots(),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           }
@@ -232,7 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
             return Text('Error: ${snapshot.error}');
           }
           return Text(
-            'Count: ${snapshot.data!.docs.first['count']}',
+            'Count: ${snapshot.data!['count']}',
             style: Theme.of(context).textTheme.bodyLarge,
           );
         },
