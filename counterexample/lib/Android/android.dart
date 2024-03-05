@@ -1,44 +1,20 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:counterexample/Android/android.dart';
-import 'package:counterexample/firebase_options.dart';
 import 'package:counterexample/storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseFirestore.instance.settings = const Settings(
-    persistenceEnabled: true,
-  );
-  if (kIsWeb) {
-    runApp(const MyApp(title: "Web"));
-  } else {
-    if (Platform.isAndroid) {
-      runApp(const MyAndroidApp());
-    } else if (Platform.isIOS) {
-      runApp(const MyApp(title: "iOS"));
-    } else {
-      runApp(const MyApp(title: "Unknown"));
-    }
-  }
-}
-
-class MyApp extends StatelessWidget {
-  final String title;
-  const MyApp({super.key, required this.title});
+class MyAndroidApp extends StatelessWidget {
+  const MyAndroidApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Android Demo',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -58,7 +34,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyHomePage(title: 'Flutter Demo $title'),
+      home: MyHomePage(title: 'Flutter Android Home Page'),
     );
   }
 }
