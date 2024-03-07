@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:form_example/pictures.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
@@ -33,7 +34,11 @@ class _LoginPageState extends State<LoginPage> {
         await FirebaseAuth.instance.signInWithCredential(credential);
 
     setState(() {
-      googleUser = googleUser;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const PhotosPage()),
+        (Route<dynamic> route) => false,
+      );
     });
 
     // Once signed in, return the UserCredential
@@ -59,29 +64,15 @@ class _LoginPageState extends State<LoginPage> {
     List<Widget> widgets = [];
     if (googleUser == null) {
       widgets.add(ElevatedButton(
-        onPressed: () async {
-          await signInWithGoogle();
-        },
-        child: const Text('Sign in with Google'),
-      ));
+          onPressed: () async {
+            await signInWithGoogle();
+          },
+          child: const Image(
+            image: AssetImage('assets/android_dark_rd_SI@3x.png'),
+            width: 200,
+          )));
     } else {
-      widgets.add(ListTile(
-          leading: GoogleUserCircleAvatar(
-            identity: googleUser!,
-          ),
-          title: Text(googleUser!.displayName ?? ""),
-          subtitle: Text(googleUser!.email)));
-      widgets.add(Text(FirebaseAuth.instance.currentUser?.uid ?? ""));
-      widgets.add(ElevatedButton(
-        onPressed: () async {
-          await FirebaseAuth.instance.signOut();
-          await GoogleSignIn().signOut();
-          setState(() {
-            googleUser = null;
-          });
-        },
-        child: const Text('Logout'),
-      ));
+      widgets.add(const Text("How'd you get here?"));
     }
     return widgets;
   }
