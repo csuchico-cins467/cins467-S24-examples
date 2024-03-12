@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:form_example/login.dart';
@@ -30,8 +31,8 @@ class _PhotosPageState extends State<PhotosPage> {
                   );
                 }))
       ]),
-      body: const Center(
-        child: Text('Photos go here'),
+      body: Center(
+        child: getBody(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -43,6 +44,38 @@ class _PhotosPageState extends State<PhotosPage> {
         tooltip: 'Add Photo',
         child: const Icon(Icons.add_a_photo),
       ),
+    );
+  }
+
+  Widget getBody() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('photos').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+        if (snapshot.hasError) {
+          return const Text('Something went wrong');
+        }
+        if (snapshot.hasData) {
+          return ListView(
+            children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data() as Map<String, dynamic>;
+              return Card(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(data['title']),
+                  Text(data['description']),
+                  Image.network(data['imageURL']),
+                ],
+              ));
+            }).toList(),
+          );
+        }
+        return const CircularProgressIndicator();
+      },
     );
   }
 }
