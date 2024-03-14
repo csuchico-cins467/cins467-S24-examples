@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:navstack/first.dart';
+import 'package:navstack/second.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -7,6 +8,11 @@ void main() {
     theme: ThemeData(
       primarySwatch: Colors.purple,
     ),
-    home: const FirstRoute(),
+    initialRoute: '/',
+    routes: {
+      '/': (context) => FirstRoute(),
+      '/second': (context) => SecondRoute(),
+      '/second/second': (context) => SecondRoute(),
+    },
   ));
 }

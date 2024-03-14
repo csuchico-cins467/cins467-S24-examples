@@ -14,21 +14,26 @@ Widget getDrawer(context) {
         ListTile(
           title: const Text('Page 1'),
           onTap: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const FirstRoute()),
-              (Route<dynamic> route) => false,
-            );
+            Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+            // Navigator.pushAndRemoveUntil(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => const FirstRoute()),
+            //   (Route<dynamic> route) => false,
+            // );
           },
         ),
         ListTile(
           title: const Text('Page 2'),
           onTap: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const SecondRoute()),
-              (Route<dynamic> route) => false,
-            );
+            Navigator.pushNamedAndRemoveUntil(
+                context, "/second", (route) => false);
+          },
+        ),
+        ListTile(
+          title: const Text('Page 3'),
+          onTap: () {
+            Navigator.pushNamedAndRemoveUntil(
+                context, "/second/second", (route) => false);
           },
         ),
       ],
