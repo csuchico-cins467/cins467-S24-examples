@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:navstack/components/drawer.dart';
 import 'package:navstack/second.dart';
 
@@ -11,12 +12,12 @@ class FirstRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text('First Route'),
       ),
-      drawer: getDrawer(context),
+      // drawer: getDrawer(context, context.widget),
       body: Center(
         child: ElevatedButton(
           child: const Text('Open route'),
           onPressed: () {
-            Navigator.pushNamed(context, '/second');
+            context.go('/second');
           },
         ),
       ),
