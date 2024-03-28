@@ -5,12 +5,61 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 stages:
+  - test
+  - lint
+  - build
   - deploy
+
+test:
+  stage: test
+  before_script:
+    - cd counter_test
+    - flutter pub get
+  script:
+    - flutter test
+  rules:
+    - if: $CI_COMMIT_BRANCH != "main"
+
+flutter_lint:
+  stage: lint
+  before_script:
+    - cd counter_test
+    - flutter pub get
+  script:
+    - flutter analyze
+  rules:
+    - if: $CI_COMMIT_BRANCH != "main"
+
+build_android:
+  stage: build
+  before_script:
+    - cd counter_test
+    - flutter pub get
+  script:
+    - flutter build apk --release
+  artifacts:
+    paths:
+      - build/app/outputs/flutter-apk/app-release.apk
+  rules:
+    - if: $CI_COMMIT_BRANCH != "main"
+
+build_web:
+  stage: build
+  before_script:
+    - cd counter_test
+    - flutter pub get
+  script:
+    - flutter build web --release
+  artifacts:
+    paths:
+      - build/web
+  rules:
+    - if: $CI_COMMIT_BRANCH != "main"
 
 pages:
   stage: deploy
   before_script:
-    - cd counterexample
+    - cd counter_test
     - flutter pub get
   script:
     - flutter build web --release
@@ -19,4 +68,4 @@ pages:
     paths:
       - public
   rules:
-    - if: $CI_COMMIT_BRANCH == "assignment2"
+    - if: $CI_COMMIT_BRANCH == "main"
