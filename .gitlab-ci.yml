@@ -5,7 +5,30 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 stages:
+  - test
+  - lint
+  - build
   - deploy
+
+test:
+  stage: test
+  before_script:
+    - cd counter_test
+    - flutter pub get
+  script:
+    - flutter test
+  rules:
+    - if: $CI_COMMIT_BRANCH != "main"
+
+flutter_lint:
+  stage: lint
+  before_script:
+    - cd counter_test
+    - flutter pub get
+  script:
+    - flutter analyze
+  rules:
+    - if: $CI_COMMIT_BRANCH != "main"
 
 pages:
   stage: deploy
@@ -19,4 +42,4 @@ pages:
     paths:
       - public
   rules:
-    - if: $CI_COMMIT_BRANCH == "assignment2"
+    - if: $CI_COMMIT_BRANCH == "main"
