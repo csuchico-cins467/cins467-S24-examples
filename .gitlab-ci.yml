@@ -59,7 +59,7 @@ build_web:
 pages:
   stage: deploy
   before_script:
-    - cd counterexample
+    - cd counter_test
     - flutter pub get
   script:
     - flutter build web --release
