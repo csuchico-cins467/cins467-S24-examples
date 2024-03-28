@@ -39,7 +39,7 @@ build_android:
     - flutter build apk --release
   artifacts:
     paths:
-      - build/app/outputs/flutter-apk/app-release.apk
+      - counter_test/build/app/outputs/flutter-apk/app-release.apk
   rules:
     - if: $CI_COMMIT_BRANCH != "main"
 
@@ -52,7 +52,7 @@ build_web:
     - flutter build web --release
   artifacts:
     paths:
-      - build/web
+      - counter_test/build/web
   rules:
     - if: $CI_COMMIT_BRANCH != "main"
 
